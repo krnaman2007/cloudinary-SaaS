@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -32,7 +31,7 @@ export default function AppLayout({
 
   const handleLogoClick = () => {
     router.push("/");
-  };
+  }
 
   const handleSignOut = async () => {
     await signOut();
