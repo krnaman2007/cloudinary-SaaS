@@ -68,6 +68,22 @@ export async function POST(request: NextRequest) {
                 uploadStream.end(buffer)
             }
         )
+        /*
+        User apni file select karta hai (e.g., 50 MB, .mov format)
+                ↓
+        originalSize = 50 MB (frontend se formData mein bheja)
+                ↓
+        Buffer bana ke Cloudinary ko upload_stream se bheja
+                ↓
+        Cloudinary apni taraf se: quality="auto" + fetch_format="mp4" apply karta hai
+                ↓
+        Compression hota hai (bitrate optimize, codec convert)
+                ↓
+        result.bytes = 12 MB (naya, compressed size — Cloudinary ne calculate kiya)
+                ↓
+        DB mein dono save: originalSize (50 MB) aur compressedSize (12 MB)
+        */
+       
         const video=await prisma.video.create({
             data: {
                 title,

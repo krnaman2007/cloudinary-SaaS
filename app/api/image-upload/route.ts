@@ -12,7 +12,7 @@ cloudinary.config({
 
 interface CloudinaryUploadResult{
     public_id: string;
-    [key: string]: any
+    [key: string]: any  //it means key can be of string or any other datatype
 }
 
 export async function POST(request: NextRequest) {
@@ -20,6 +20,17 @@ export async function POST(request: NextRequest) {
 
     if(!userId){
         return NextResponse.json({error: "Unauthorized"},{status: 401})
+    }
+
+    if(
+        !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
+        !process.env.CLOUDINARY_API_KEY ||
+        !process.env.CLOUDINARY_API_SECRET
+    ){
+        return NextResponse.json(
+            {error: "Cloudinary credentials not found"},
+            {status: 500}
+        )
     }
 
     try {
@@ -35,13 +46,18 @@ export async function POST(request: NextRequest) {
 
         const result=await new Promise<CloudinaryUploadResult>(
             (resolve,reject)=>{
+                // Step 1: Ek writable stream bana (khula funnel, Cloudinary se connected)
                 const uploadStream=cloudinary.uploader.upload_stream(
                     {folder: "next-cloudinary-uploads"},
                     (error, result)=>{
+                        // Step 3: Jab Cloudinary upload complete kar deta hai,
+                        // yeh callback trigger hoga
                         if(error) reject(error);
                         else resolve(result as CloudinaryUploadResult)
                     }
                 )
+                // Step 2: Buffer (tumhari file ka binary data) ko 
+                // is funnel mein daal diya, aur bata diya "data khatam"
                 uploadStream.end(buffer)
             }
         )

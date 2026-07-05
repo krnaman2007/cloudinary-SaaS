@@ -3,6 +3,11 @@ import prisma from "@/lib/prisma"
 
 export async function GET(request: NextRequest){
     try {
+        /*
+            schema mein model ka naam Video hai (capital V) — Prisma convention follow karta hai:
+            Schema mein: model Video { ... }
+            Generated client mein: prisma.video (lowercase, camelCase)
+        */
         const videos=await prisma.video.findMany({
             orderBy: {
                 createdAt: "desc"
